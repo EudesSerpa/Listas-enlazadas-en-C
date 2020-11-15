@@ -1,16 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct Student{
+	char *ptrNombre;
+	struct Student *ptrNextAlumn;
+};
+
 struct Nodo{
-	char *ptrDocente;
-	char *ptrAlumno;
+	char *ptrNombre;
+	char *ptrApellido;
+	char *ptrEdad;
+	char *ptrPeso;
+	struct Student *ptrStudent;
 	struct Nodo *ptrNext;
 }; 
 
 typedef struct Nodo Nodo;
+typedef struct Student Student;
 
 Nodo *header = NULL;
 Nodo *footer = NULL;
+//Student *first = NULL;
+//Student *last = NULL;
 
 Nodo *create_nodo();
 void insert_nodo(Nodo *nodo);
@@ -19,13 +30,27 @@ void free_memory();
 
 int main(void){
 
-	Nodo *nodo1 = create_nodo();
-	Nodo *nodo2 = create_nodo();
+ 	unsigned	char teachers = 0, i = 0;
+	Nodo *ptrDocentes = NULL;
 
-	insert_nodo(nodo1);
-	insert_nodo(nodo2);
+	printf("Write the numbers of teachers to assign: ");
+	scanf("%1u",&teachers);
+
+//	system("Pause");
+
+	ptrDocentes = (Nodo *) malloc(sizeof(Nodo) * teachers); //Array of pointers for nodos
+
+	for(i=0; i<teachers; i++){
+		printf("Docente %d\r\n", i+1);
+		Nodo *nodo1 = create_nodo();
+		*(ptrDocentes + i) = *nodo1; //Location stored in array
+	}
+
+	for(i=0; i<teachers; i++)
+		insert_nodo(ptrDocentes + i);
 	
 	show_list();
+
 	free_memory();
 
 	return (0);
@@ -36,25 +61,30 @@ Nodo *create_nodo(){
 		Return:
 			Puntero al nuevo nodo.*/	
 	char *data(); //Prototipo
+	static char i=0;
 
-	char *ptrTeacher = NULL;
-	char *ptrAlumn = NULL;
-
-	printf("Write the teacher's name: ");
-	ptrTeacher = data();
-	printf("Write the alumns's name: ");
-	ptrAlumn = data();
-	
 	Nodo *new_nodo = (Nodo *) malloc(sizeof(Nodo)); //Crea nodo
+	Student *new_alumn = (Student *) malloc(sizeof(Student));
+	
+	if(i==0){ //ARREGLAR. SI NO SE LEE ALGO ANTES, LA PRIMERA VEZ QUE SE LLAME PARA CREAR EL 1ra NODO, ES COMO QUE SI SE LEYESE UN SALTO DE LINEA YA QUE NO DA LA OPCION PARA INGRESAR EL NOMBRE DEL PROFESOR EN DICHA 1ra PASADA. 
+		new_nodo->ptrNombre = data();
+		i++;
+	}
+	printf("Write the teacher's name: ");
+	new_nodo->ptrNombre = data();
+	printf("Write the teacher's last name: ");
+	new_nodo->ptrApellido = data();
+	printf("Write the teacher's age: ");
+	new_nodo->ptrEdad = data();  
+	printf("Write the teacher's weight: ");
+	new_nodo->ptrPeso = data();
 
-	new_nodo->ptrDocente = ptrTeacher;
-	new_nodo->ptrAlumno = ptrAlumn;
+	printf("Write the Alumn's name: ");
+	new_nodo->ptrStudent = new_alumn; 
+	new_nodo->ptrStudent->ptrNombre= data();
+	
 	new_nodo->ptrNext = NULL;
-
-	//free(ptrTeacher); //Free Memory 
-	//free(ptrAlumn);
-	ptrTeacher = NULL;
-	ptrAlumn = NULL;
+	new_nodo->ptrStudent->ptrNextAlumn = NULL;
 
 	return new_nodo;
 }
@@ -95,9 +125,11 @@ void show_list(){
 		puts("Empty list");
 		return;
 	}else{
-		puts("List is...");
+		printf("\r\nThe list is...\r\n");
 		while(scroll != NULL){
-			printf("Docente: %s\rAlumno: %s\r\n", scroll->ptrDocente, scroll->ptrAlumno);			
+			printf("\r\nNombre: %s\r\nApellido: %s\r\n", scroll->ptrNombre, scroll->ptrApellido);			
+			printf("Edad: %s\r\nPeso: %s\r\n", scroll->ptrEdad, scroll->ptrPeso);			
+			printf("Alumnos: [%s]\r\n", scroll->ptrStudent->ptrNombre);
 			scroll = scroll->ptrNext;
 		}
 	}
@@ -114,6 +146,7 @@ void free_memory(){
 		while(scroll != NULL){
 			header = scroll->ptrNext; //Update header of list
 			free(scroll);
+			//free(scroll->ptrStudent);
 			scroll = header;
 		}
 		header = NULL;
