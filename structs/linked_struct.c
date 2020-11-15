@@ -21,7 +21,6 @@ typedef struct Student Student;
 
 Nodo *header = NULL;
 Nodo *footer = NULL;
-//Student *first = NULL;
 Student *last = NULL;
 
 Nodo *create_nodo(Student **ptrAlumnxDoc);
@@ -36,9 +35,8 @@ int main(void){
 	Student **ptrAlumnxDoc = NULL; //Vector de punteros Student *ptrAlumnxDoc[0]; 
 
 	printf("Write the numbers of teachers to assign: ");
-	scanf("%1u",&teachers);
-
-//	system("Pause");
+	scanf("%u",&teachers);
+	while(getchar() != '\n'); //Limpiar buffer (Sino, se toma un \n para el 1er nombre del 1er profesor.)
 
 	ptrDocentes = (Nodo *) malloc(sizeof(Nodo) * teachers); //Array of pointers for nodos
 	ptrAlumnxDoc = (Student **) malloc(sizeof(Student) * teachers); //Array of pointers for alumns x teachers
@@ -68,14 +66,11 @@ Nodo *create_nodo(Student **ptrAlumnxDoc){
 			- Puntero al nuevo nodo.
 	*/	
 	char *data(); //Prototipo
-	static char x=0, y=0;
+	static char y=0;
 	unsigned char alumns = 0, i=0;
 
 	Nodo *new_nodo = (Nodo *) malloc(sizeof(Nodo)); //Crea nodo
 	
-	if(x==0)  
-		new_nodo->ptrNombre = data(); //Fail, si no se lee algo antes, para el 1er nodo al nombre del profesor lee 
-												//un salto de linea o algo asi.
 	printf("Write the teacher's name: ");
 	new_nodo->ptrNombre = data();
 	printf("Write the teacher's last name: ");
@@ -86,11 +81,8 @@ Nodo *create_nodo(Student **ptrAlumnxDoc){
 	new_nodo->ptrPeso = data();
 
 	printf("how many students does this teacher has?: ");
-	scanf("%d", &alumns);
-	if(x>=0){ //Lo mismo que antes, no deja ingresar nada la primera vez. El SCANF es el problema. 
-		data();
-		x++;
-	}
+	scanf("%u", &alumns);
+	while(getchar() != '\n'); //Limpiar buffer (Sino, se toma un \n para el 1er nombre del 1er Alumn.)
 	
 	for(i=0; i<alumns; i++){
 		Student *new_alumn = (Student *) malloc(sizeof(Student));
