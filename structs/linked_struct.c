@@ -19,9 +19,9 @@ struct Nodo{
 typedef struct Nodo Nodo;
 typedef struct Student Student;
 
-Nodo *header = NULL;
+Nodo *header = NULL; //Punteros lista doc
 Nodo *footer = NULL;
-Student *last = NULL;
+Student *last = NULL; //Punteros lista alumn
 
 Nodo *create_nodo(Student **ptrAlumnxDoc);
 void append(Nodo *nodo);
@@ -38,7 +38,6 @@ int main(void){
 	printf("Write the numbers of teachers to assign: ");
 	scanf("%u",&teachers);
 	while(getchar() != '\n'); //Limpiar buffer (Sino, se toma un \n para el 1er nombre del 1er profesor)
-
 	ptrDocentes = (Nodo *) malloc(sizeof(Nodo) * teachers); //Array de tipo Nodo
 	ptrAlumnxDoc = (Student **) malloc(sizeof(Student) * teachers);
 
