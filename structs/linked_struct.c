@@ -25,7 +25,6 @@ Student *last = NULL; //Punteros lista alumn
 
 Nodo *create_nodo(Student **ptrAlumnxDoc);
 void append(Nodo *nodo);
-void insert(Nodo *nodo, int pos);
 void show_list(Student **ptrAxD);
 void free_memory();
 
@@ -49,7 +48,6 @@ int main(void){
 
 	for(i=0; i<teachers; i++)
 		append(ptrDocentes + i);
-	//insert(ptrDocentes+i, 0); //WARNING: Los alumnos no cambian de posicion si se trabaja asi.
 
 	show_list(ptrAlumnxDoc);
 
@@ -113,53 +111,20 @@ char *data(){
 		Return:
 	   		Puntero al texto leido
 	*/
+	unsigned char len = 0;
 	size_t n_bytes = 0;
 	size_t size_line = 0;
 	char *ptrName = NULL;
 
 	if ((size_line = getline(&ptrName, &n_bytes, stdin)) == -1)
 		puts("ERROR: EOF found wihtout reading any byte / Others errors");
-	else //WARNING: Existen saltos de lineas. Se deben Eliminar
+	else 
+		len = strlen(ptrName);
+		if(ptrName[len - 1] == '\n') //Elimina saltos de linea.
+			ptrName[len - 1] = '\0';
+		
+		//printf("%s", ptrName);
 		return ptrName;
-}
-
-void insert(Nodo *nodo, int pos){
-	/* Inserta un nodo en la lista, en el indice especificado.
-		Args:
-			- Nodo *nodo: Puntero a la estructura Nodo. Nodo a insertar en la lista.
-			- int pos: Indice para posicion de insercion del nodo.
-	*/
-	unsigned char n = 0;
-	Nodo *ptrant = NULL;
-	Nodo *ptractual = header;
-
-	if(header == NULL){
-		puts("Empty list. Insert to start (pos=0)");
-		append(nodo); //Insecion al inicio de la lista.
-		return;
-	}
-
-	if(pos != 0){ //pos>0 con nodos en lista. Insercion entre nodos.
-		while(ptractual != NULL){
-			if(n == pos){
-				ptrant->ptrNext = nodo;
-				nodo->ptrNext = ptractual;
-				return;
-			}else{
-				ptrant = ptractual;
-				ptractual = ptractual->ptrNext;
-				n++;
-			}
-		}
-		puts("Posicion mayor a los nodos actuales en la lista, insert to end");
-		append(nodo); //Insercion al final de la lista. 
-		n = 0;
-		return;
-	}else{ //pos=0 con al menos 1 nodo en la lista. Insercion al inicio.
-		header = nodo;
-		header->ptrNext = ptractual;
-		return;
-	}
 }
 
 void append(Nodo *nodo){ 
@@ -192,15 +157,12 @@ void show_list(Student **ptrAxD){
 		printf("\r\nThe list is...\r\n");
 		puts("[");
 		while(scroll != NULL){
-			puts("\t{");
-			printf("\t\tNombre: %s\r\n\t\tApellido: %s\r\n", scroll->ptrNombre, scroll->ptrApellido);
-			printf("\t\tEdad: %s\r\n\t\tPeso: %s\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);			
-			printf("Alumnos: [");
+			printf("\t{\r\n\t\t");
+			printf("'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
+			printf("\t\t'Edad': %s,\r\n\t\t'Peso': %s,\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);			
+			printf("'Alumnos': [");
 			while(*(ptrAxD+i) != NULL){
-				len = strlen((*(ptrAxD+i))->ptrNombre);//Lenght of names.
-				if((*(ptrAxD+i))->ptrNombre[len - 1] == '\n') //Eliminar saltos de linea
-					(*(ptrAxD+i))->ptrNombre[len - 1] = '\0';
-				printf("%s, ", (*(ptrAxD+i))->ptrNombre); //v[0+i] = ptr = &var ---> *v[0+i] == var 
+				printf("'%s', ", (*(ptrAxD+i))->ptrNombre); //v[0+i] = ptr = &var ---> *v[0+i] == var 
 				*(ptrAxD+i)= (*(ptrAxD+i))->ptrNextAlumn;
 			}
 			printf("]\r\n");
