@@ -25,43 +25,42 @@ Student *last = NULL; //Punteros lista alumn
 
 Nodo *create_nodo(Student **ptrAlumnxDoc);
 void append(Nodo *nodo);
-void show_list(Student **ptrAxD, FILE *ptrFP){
-void write_file(FILE *ptrFP);
+void show_list(Student **ptrAxD, FILE *ptrFP);
 void free_memory();
 
 int main(void){
 
  	unsigned	char teachers = 0, i = 0;
 	Nodo *ptrDocentes = NULL; //Array de tipo Nodo.
-	Student **ptrAlumnxDoc = NULL; //Array de punteros: Student *ptrAlumnxDoc[0]; 	
+	Student **ptrAlumnxDoc = NULL; //Array de punteros: Student *ptrAlumnxDoc[]; 	
 	FILE *ptrFile = NULL;
 	
-	if((ptrFile = fopen("Leidy.txt", "a")) == NULL){
+	if((ptrFile = fopen("Leidy.txt", "w")) == NULL){
 		printf("ERROR: File not created/loaded\r\n");
 		return (1);
 	}else
 		printf("File created/loaded\r\n");
-		//write_file(ptrFile);
 
 	printf("Write the numbers of teachers to assign: ");
 	scanf("%u",&teachers);
-	while(getchar() != '\n'); //Limpiar buffer (Sino, se toma un \n para el 1er nombre del 1er profesor)
+	while(getchar() != '\n'); //Limpiar buffer
+
 	ptrDocentes = (Nodo *) malloc(sizeof(Nodo) * teachers); //Array de tipo Nodo
 	ptrAlumnxDoc = (Student **) malloc(sizeof(Student) * teachers);
 
-	for(i=0; i<teachers; i++){
+	for(i=0; i<teachers; i++){ //Creacion e inicializacion de nodos
 		printf("Docente %d\r\n", i+1);
 		Nodo *nodo1 = create_nodo(ptrAlumnxDoc); 
-		*(ptrDocentes + i) = *nodo1; //Location stored in array
+		*(ptrDocentes + i) = *nodo1; //Almacena ubicacion del nodo en el array
 	}
 
-	for(i=0; i<teachers; i++)
+	for(i=0; i<teachers; i++) //Insercion (al final) de nodos
 		append(ptrDocentes + i);
 
 	show_list(ptrAlumnxDoc, ptrFile);
 
-	free_memory();
 	fclose(ptrFile);
+	free_memory();
 
 	return (0);
 }
@@ -91,7 +90,7 @@ Nodo *create_nodo(Student **ptrAlumnxDoc){
 
 	printf("how many students does this teacher has?: ");
 	scanf("%u", &alumns);
-	while(getchar() != '\n'); //Limpiar buffer (Sino, se toma un \n para el 1er nombre del 1er Alumn.)
+	while(getchar() != '\n'); //Limpiar buffer 
 	
 	for(i=0; i<alumns; i++){
 		Student *new_alumn = (Student *) malloc(sizeof(Student));
@@ -101,7 +100,7 @@ Nodo *create_nodo(Student **ptrAlumnxDoc){
 		new_alumn->ptrNextAlumn = NULL;
 			
 		if(i == 0){//First alumn (first nodo)
-			new_nodo->ptrStudent = new_alumn; //El miembro de la struct padre apunta al primer nodo de la list alumns
+			new_nodo->ptrStudent = new_alumn; //Miembro de struct padre apunta al primer nodo de list alumns
 			*(ptrAlumnxDoc + y) = new_alumn; //Almacena la dir del inicio de la list de alumns. 
 			last = new_alumn;
 			y++;
@@ -128,13 +127,12 @@ char *data(){
 
 	if ((size_line = getline(&ptrName, &n_bytes, stdin)) == -1)
 		puts("ERROR: EOF found wihtout reading any byte / Others errors");
-	else 
+	else{ 
 		len = strlen(ptrName);
 		if(ptrName[len - 1] == '\n') //Elimina saltos de linea.
 			ptrName[len - 1] = '\0';
-		
-		//printf("%s", ptrName);
 		return ptrName;
+	}
 }
 
 void append(Nodo *nodo){ 
@@ -153,42 +151,63 @@ void append(Nodo *nodo){
 
 void show_list(Student **ptrAxD, FILE *ptrFP){
 	/* Recorre la lista de docentes y de sus estudiantes para muestrar los datos de sus nodos.
+	 * Escribe listas en el archivo abierto/creado previamente.
 		Args: 
 			- Student **ptrAxD: Vector de punteros la estructura Student. 
-									  Almacenan los punteros al header de listas de alumnos para cada profesor.
+								  Almacenan los punteros al header de listas de alumnos para cada profesor
+			- FILE *ptrFP: Puntero al descriptor de archivo abierto/creado por fopen.
 	*/
 	Nodo *scroll = header;
-	unsigned char i = 0, len=0;
+	Student *ptrA = NULL;
+	unsigned char i = 0, len=0, amount=0;
 
 	if(scroll == NULL){
 		puts("Empty list");
 		return;
 	}else{
 		printf("\r\nThe list is...\r\n");
-		//fwrite
+		fputs("[\n", ptrFP);
 		puts("[");
 		while(scroll != NULL){
+			fputs("\t{\r\n\t\t", ptrFP);
 			printf("\t{\r\n\t\t");
+			fprintf(ptrFP, "'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
 			printf("'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
-			printf("\t\t'Edad': %s,\r\n\t\t'Peso': %s,\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);			
+			fprintf(ptrFP, "\t\t'Edad': '%s',\r\n\t\t'Peso': '%s',\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);
+			printf("\t\t'Edad': %s,\r\n\t\t'Peso': %s,\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);
+			fputs("'Alumnos': [", ptrFP);
 			printf("'Alumnos': [");
-			while(*(ptrAxD+i) != NULL){
-				printf("'%s', ", (*(ptrAxD+i))->ptrNombre); //v[0+i] = ptr = &var ---> *v[0+i] == var 
+			
+			ptrA = *(ptrAxD+i); //Almacena pos de inicio de lista 
+			while(*(ptrAxD+i) != NULL){ //Conocer cantidad de alumnos para el docente
+				amount++;
 				*(ptrAxD+i)= (*(ptrAxD+i))->ptrNextAlumn;
 			}
+			
+			*(ptrAxD+i) = ptrA; //Vuelve a la cabeza de la list
+			while(*(ptrAxD+i) != NULL){//Imprimir nodos.
+				if(len == amount-1){//Ultimo estudiante.
+					fprintf(ptrFP, "'%s'", (*(ptrAxD+i))->ptrNombre);
+					printf("'%s'", (*(ptrAxD+i))->ptrNombre); 
+				}else{
+					fprintf(ptrFP, "'%s', ", (*(ptrAxD+i))->ptrNombre);
+					printf("'%s', ", (*(ptrAxD+i))->ptrNombre); //*v[0+i]==ptr->Struct Student. 
+				}
+				len++;
+				*(ptrAxD+i)= (*(ptrAxD+i))->ptrNextAlumn;
+			}
+
+			fputs("]\r\n", ptrFP);
 			printf("]\r\n");
+			fputs("\t},\r\n", ptrFP);
 			puts("\t},\r\n");
 			scroll = scroll->ptrNext;
 			i++;
 		}
 		puts("]\r\n");
+		fputs("]\r\n", ptrFP);
+		amount = i = 0;
 	}
-}
-
-void write_file(FILE *ptrFP){
-	
-	puts("File created/loaded");
-
 }
 
 void free_memory(){

@@ -1,0 +1,23 @@
+[
+	{
+		'Nombre': 'a',
+		'Apellido': 'q',
+		'Edad': '1',
+		'Peso': '2',
+		'Alumnos': ['s', 'd', 'f']
+	},
+	{
+		'Nombre': 'y',
+		'Apellido': 'u',
+		'Edad': '6',
+		'Peso': '5',
+		'Alumnos': ['k', 'l', 'j', 'h', 'g']
+	},
+	{
+		'Nombre': 'm',
+		'Apellido': 'n',
+		'Edad': '7',
+		'Peso': '4',
+		'Alumnos': ['s', 'x', 'a']
+	},
+]
