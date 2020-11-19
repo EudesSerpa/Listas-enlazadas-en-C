@@ -25,14 +25,23 @@ Student *last = NULL; //Punteros lista alumn
 
 Nodo *create_nodo(Student **ptrAlumnxDoc);
 void append(Nodo *nodo);
-void show_list(Student **ptrAxD);
+void show_list(Student **ptrAxD, FILE *ptrFP){
+void write_file(FILE *ptrFP);
 void free_memory();
 
 int main(void){
 
  	unsigned	char teachers = 0, i = 0;
-	Nodo *ptrDocentes = NULL;
-	Student **ptrAlumnxDoc = NULL; //Array de punteros: Student *ptrAlumnxDoc[0]; 
+	Nodo *ptrDocentes = NULL; //Array de tipo Nodo.
+	Student **ptrAlumnxDoc = NULL; //Array de punteros: Student *ptrAlumnxDoc[0]; 	
+	FILE *ptrFile = NULL;
+	
+	if((ptrFile = fopen("Leidy.txt", "a")) == NULL){
+		printf("ERROR: File not created/loaded\r\n");
+		return (1);
+	}else
+		printf("File created/loaded\r\n");
+		//write_file(ptrFile);
 
 	printf("Write the numbers of teachers to assign: ");
 	scanf("%u",&teachers);
@@ -49,9 +58,10 @@ int main(void){
 	for(i=0; i<teachers; i++)
 		append(ptrDocentes + i);
 
-	show_list(ptrAlumnxDoc);
+	show_list(ptrAlumnxDoc, ptrFile);
 
 	free_memory();
+	fclose(ptrFile);
 
 	return (0);
 }
@@ -141,7 +151,7 @@ void append(Nodo *nodo){
 	}
 }
 
-void show_list(Student **ptrAxD){
+void show_list(Student **ptrAxD, FILE *ptrFP){
 	/* Recorre la lista de docentes y de sus estudiantes para muestrar los datos de sus nodos.
 		Args: 
 			- Student **ptrAxD: Vector de punteros la estructura Student. 
@@ -155,6 +165,7 @@ void show_list(Student **ptrAxD){
 		return;
 	}else{
 		printf("\r\nThe list is...\r\n");
+		//fwrite
 		puts("[");
 		while(scroll != NULL){
 			printf("\t{\r\n\t\t");
@@ -172,6 +183,12 @@ void show_list(Student **ptrAxD){
 		}
 		puts("]\r\n");
 	}
+}
+
+void write_file(FILE *ptrFP){
+	
+	puts("File created/loaded");
+
 }
 
 void free_memory(){
