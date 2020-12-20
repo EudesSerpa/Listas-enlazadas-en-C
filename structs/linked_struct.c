@@ -35,7 +35,7 @@ int main(void){
 	Student **ptrAlumnxDoc = NULL; //Array de punteros: Student *ptrAlumnxDoc[]; 	
 	FILE *ptrFile = NULL;
 	
-	if((ptrFile = fopen("Leidy.txt", "w")) == NULL){
+	if((ptrFile = fopen("Leidy.json", "w")) == NULL){
 		printf("ERROR: File not created/loaded\r\n");
 		return (1);
 	}else
@@ -93,7 +93,7 @@ Nodo *create_nodo(Student **ptrAlumnxDoc){
 	while(getchar() != '\n'); //Limpiar buffer 
 	
 	for(i=0; i<alumns; i++){
-		Student *new_alumn = (Student *) malloc(sizeof(Student));
+		Student *new_alumn = (Student *) malloc(sizeof(Student)); //Crear nodo para alumnos
 		
 		printf("Write the Alumn's name: ");
 		new_alumn->ptrNombre = data(); //Inicializar nodo del alumno.
@@ -150,11 +150,11 @@ void append(Nodo *nodo){
 }
 
 void show_list(Student **ptrAxD, FILE *ptrFP){
-	/* Recorre la lista de docentes y de sus estudiantes para muestrar los datos de sus nodos.
+	/* Recorre la lista de docentes y de sus estudiantes para mostrar los datos de sus nodos.
 	 * Escribe listas en el archivo abierto/creado previamente.
 		Args: 
-			- Student **ptrAxD: Vector de punteros la estructura Student. 
-								  Almacenan los punteros al header de listas de alumnos para cada profesor
+			- Student **ptrAxD: Vector de punteros a la estructura Student. 
+					(Se almacenan los punteros a los headers de las listas de alumnos para cada profesor)
 			- FILE *ptrFP: Puntero al descriptor de archivo abierto/creado por fopen.
 	*/
 	Nodo *scroll = header;
@@ -165,48 +165,43 @@ void show_list(Student **ptrAxD, FILE *ptrFP){
 		puts("Empty list");
 		return;
 	}else{
-		printf("\r\nThe list is...\r\n");
 		fputs("[\n", ptrFP);
-		puts("[");
-		while(scroll != NULL){
+		while(scroll != NULL){//Escribe en archivo los datos de los nodos doc en format JSON (parecido)
 			fputs("\t{\r\n\t\t", ptrFP);
-			printf("\t{\r\n\t\t");
-			fprintf(ptrFP, "'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
-			printf("'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
-			fprintf(ptrFP, "\t\t'Edad': '%s',\r\n\t\t'Peso': '%s',\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);
-			printf("\t\t'Edad': %s,\r\n\t\t'Peso': %s,\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);
-			fputs("'Alumnos': [", ptrFP);
-			printf("'Alumnos': [");
 			
-			ptrA = *(ptrAxD+i); //Almacena pos de inicio de lista 
+			fprintf(ptrFP, "'Nombre': '%s',\r\n\t\t'Apellido': '%s',\r\n", scroll->ptrNombre, scroll->ptrApellido);
+			
+			fprintf(ptrFP, "\t\t'Edad': '%s',\r\n\t\t'Peso': '%s',\r\n\t\t", scroll->ptrEdad, scroll->ptrPeso);
+			
+			fputs("'Alumnos': [", ptrFP);
+			
+			ptrA = *(ptrAxD+i); //Almacena pos de inicio de lista
 			while(*(ptrAxD+i) != NULL){ //Conocer cantidad de alumnos para el docente
 				amount++;
-				*(ptrAxD+i)= (*(ptrAxD+i))->ptrNextAlumn;
+				*(ptrAxD+i) = (*(ptrAxD+i))->ptrNextAlumn;
 			}
 			
 			*(ptrAxD+i) = ptrA; //Vuelve a la cabeza de la list
-			while(*(ptrAxD+i) != NULL){//Imprimir nodos.
-				if(len == amount-1){//Ultimo estudiante.
+			while(*(ptrAxD+i) != NULL){//Recorrer nodos de Alumnos y se escriben en el archivo.
+				if(len == amount-1){
+					//Ultimo estudiante (Solo para quitar la , final)
 					fprintf(ptrFP, "'%s'", (*(ptrAxD+i))->ptrNombre);
-					printf("'%s'", (*(ptrAxD+i))->ptrNombre); 
 				}else{
 					fprintf(ptrFP, "'%s', ", (*(ptrAxD+i))->ptrNombre);
-					printf("'%s', ", (*(ptrAxD+i))->ptrNombre); //*v[0+i]==ptr->Struct Student. 
 				}
+				
 				len++;
 				*(ptrAxD+i)= (*(ptrAxD+i))->ptrNextAlumn;
 			}
 
 			fputs("]\r\n", ptrFP);
-			printf("]\r\n");
 			fputs("\t},\r\n", ptrFP);
-			puts("\t},\r\n");
 			scroll = scroll->ptrNext;
 			i++;
 		}
-		puts("]\r\n");
+
 		fputs("]\r\n", ptrFP);
-		amount = i = 0;
+		amount = i = 0; //Restart 
 	}
 }
 
@@ -218,7 +213,7 @@ void free_memory(){
 	Nodo *scroll = header;
 	
 	if(scroll == NULL){
-		puts("\r\nWARNING: No se han insertado nodos a la lista para liberar memoria automaticamente.");
+		puts("\r\nWARNING: No se han insertado nodos a la lista para liberar memoria");
 		return;
 	}else{
 		while(scroll != NULL){
@@ -238,7 +233,7 @@ void free_student(Nodo *scroll){
 		Libera la memoria asignada para la lista de estudiantes
 	*/
 	if(scroll == NULL){
-		puts("\r\nWARNING: No se han insertado nodos a la lista para liberar memoria automaticamente.");
+		puts("\r\nWARNING: No se han insertado nodos a la lista para liberar memoria");
 		return;
 	}else{
 		free(scroll->ptrStudent);
